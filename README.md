@@ -1,25 +1,23 @@
 # README #
 
 * A program written to help you draft tweets. Apparently my creative composition class next year will use twitter, so this is a lil' sumpin' to help out.
+
 Undergoing rapid development
-Written and created by Joshua Manuel
-Written in Python
 
 * Version 1.0.0
 
 ### How do I get set up? ###
 
-* Summary of set up
-Download the source code, then install Python if you don't have it on your system. The only dependency not part of the Python standard distribution is tweepy, which you can download from your repository (Linux) or https://github.com/tweepy/tweepy
+* Summary of set up: Download the source code, then install Python if you don't have it on your system. The only dependency not part of the Python standard distribution is tweepy, which you can download from your repository (Linux) or https://github.com/tweepy/tweepy
 
-* Configuration
-Just donwload the source and install python and tweepy. I'm working on creating and distributing binaries... not that good yet. :)
+* Configuration: Just donwload the source and install python and tweepy. I'm working on creating and distributing binaries... not that good yet. :)
 
 * Dependencies
+
 1. Python Standard Library
-..* Tkinter
-..* cPickle
-..* webbrowser
+  * Tkinter
+  * cPickle
+  * webbrowser
 
 2. Tweepy
 
