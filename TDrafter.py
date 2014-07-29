@@ -15,13 +15,13 @@ class Example(Frame):
         
         self.apikey="kFccJJtoM20smgxwIjGnCcqDX"
         self.apisecret="7cz3XcENohWT2N2KvRh6pwXXs0WC9gHVb6Mf9pW8caGoGlbDIV"
-        #self.atoken=""
-        #self.asecret=""
         
-        self.getAccess()
+        #self.getAccess()
+
         self.parent = parent
         self.initUI()
         self.loadSavedTweets()
+        self.loadAccess()
         
     def initUI(self):
         
@@ -43,12 +43,10 @@ class Example(Frame):
         self.deleteButton = Button(self, text="Delete", command = lambda: self.delete()).pack(side = BOTTOM)
         
         self.saveBox = Listbox(self, width = 70, height = 100)
-        
-        
+
     def loadSavedTweets(self): #also prints them :)
         self.saveBox.delete(0, END) #deletes what's currently in there
         self.writeBox.delete("1.0", END)
-        print ("Loaded, I guess")
         theFile = open("savedTweets.p", "r")
         try:
             self.tweets = pickle.load(theFile)
@@ -59,39 +57,42 @@ class Example(Frame):
             
         theFile.close()
         self.saveBox.pack(padx=10, pady=10, side=BOTTOM)
-        print ("Tweets array: ", self.tweets)
-        
         
     def getWriteBox(self):
         contents = self.writeBox.get("1.0", END)
         return contents
     
     def getSaveBox(self):
-        index = int(self.saveBox.curselection()[0])
-        return self.saveBox.get(index)
+        theTweet = int(self.saveBox.curselection()[0])
+        return self.saveBox.get(theTweet)
         
     def tweet(self):
         draft = self.getSaveBox().strip()
-        api = tp.API(self.auth)
-        api.update_status(draft)
-        print "Tweeted. Phew!"
+        try:
+            api = tp.API(self.auth)
+            api.update_status(draft)
+            print "Tweeted. Phew!"
+        except tp.TweepError:
+            print tp.tweepError
+            self.getAccess()
 
     def saveCurrent(self):
-        draft = self.getWriteBox()
-        self.tweets.append(draft)
-        self.saveTweets()
+        if len(self.getWriteBox()) > 140:
+            print "Sorry, too long! This is twitter, remember?"
+        else:
+            draft = self.getWriteBox().strip()
+            self.tweets.append(draft)
+            self.saveTweets()
         
     def saveTweets(self):
         theFile = open("savedTweets.p", "w")
         pickle.dump(self.tweets, theFile)
         theFile.close()
-        print ("Saved, I guess")
         self.loadSavedTweets()
         
         
     def delete(self):
         theTweet = self.getSaveBox()
-        print theTweet
         self.tweets.remove(theTweet)
         self.saveTweets()
         self.loadSavedTweets()
@@ -99,7 +100,6 @@ class Example(Frame):
     def updateCount(self, hello):
         value = self.count()
         value = str(value-1)
-        print value
         self.charNum.set(value)
         
     def count(self):
@@ -112,6 +112,21 @@ class Example(Frame):
         pin = raw_input("Type your verification pin: ").strip()
         token = self.auth.get_access_token(pin)
         self.auth.set_access_token(token.key, token.secret)
+        print self.auth
+        self.saveAccess()
+    
+    def saveAccess(self):
+        theFile = open("data.p", "w")
+        pickle.dump (self.auth, theFile)
+        print "Saved THE TOKEN!"
+        
+    def loadAccess(self):
+        try:
+            theFile = open("data.p", "r")
+            self.auth = pickle.load(theFile)
+            print "Loaded access token"
+        except:
+            print "No auth token yet!"
         
 
 def main():
