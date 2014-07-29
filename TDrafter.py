@@ -7,23 +7,25 @@ Created on Jul 24, 2014
 from Tkinter import *
 import cPickle as pickle
 import tweepy as tp
+import webbrowser
 
 class Example(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent, background="white")
         
-        self.apikey=""
-        self.apisecret=""
-        self.atoken=""
-        self.asecret=""
+        self.apikey="kFccJJtoM20smgxwIjGnCcqDX"
+        self.apisecret="7cz3XcENohWT2N2KvRh6pwXXs0WC9gHVb6Mf9pW8caGoGlbDIV"
+        #self.atoken=""
+        #self.asecret=""
         
+        self.getAccess()
         self.parent = parent
-        
         self.initUI()
         self.loadSavedTweets()
         
     def initUI(self):
-        self.parent.title("Twritter")
+        
+        self.parent.title("TDrafter")
         self.pack(fill = BOTH, expand=True)
         
         self.writeBox = Text(self, width = 50, height = 3, padx = 10, pady = 10)
@@ -55,7 +57,6 @@ class Example(Frame):
         except:
             self.tweets = []
             
-             
         theFile.close()
         self.saveBox.pack(padx=10, pady=10, side=BOTTOM)
         print ("Tweets array: ", self.tweets)
@@ -71,14 +72,11 @@ class Example(Frame):
         
     def tweet(self):
         draft = self.getSaveBox().strip()
-        auth = tp.OAuthHandler(self.apikey, self.apisecret)
-        auth.set_access_token(self.atoken, self.asecret)
-        api = tp.API(auth)
+        api = tp.API(self.auth)
         api.update_status(draft)
         print "Tweeted. Phew!"
 
     def saveCurrent(self):
-        
         draft = self.getWriteBox()
         self.tweets.append(draft)
         self.saveTweets()
@@ -107,6 +105,14 @@ class Example(Frame):
     def count(self):
         a = self.getWriteBox()
         return len(a)
+    
+    def getAccess(self):
+        self.auth = tp.OAuthHandler(self.apikey, self.apisecret)
+        webbrowser.open(self.auth.get_authorization_url())
+        pin = raw_input("Type your verification pin: ").strip()
+        token = self.auth.get_access_token(pin)
+        self.auth.set_access_token(token.key, token.secret)
+        
 
 def main():
     root = Tk()
