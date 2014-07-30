@@ -15,8 +15,6 @@ class Example(Frame):
         
         self.apikey="kFccJJtoM20smgxwIjGnCcqDX"
         self.apisecret="7cz3XcENohWT2N2KvRh6pwXXs0WC9gHVb6Mf9pW8caGoGlbDIV"
-        
-        #self.getAccess()
 
         self.parent = parent
         self.initUI()
@@ -28,21 +26,21 @@ class Example(Frame):
         self.parent.title("TDrafter")
         self.pack(fill = BOTH, expand=True)
         
-        self.writeBox = Text(self, width = 50, height = 3, padx = 10, pady = 10)
+        self.writeBox = Text(self, padx = 10, pady = 10, width = 40, height = 4)
         self.writeBox.insert("1.0","draft your tweet here!")
-        self.writeBox.pack(side = TOP, padx = 10, pady = 10)
+        self.writeBox.grid(row = 0, column = 0, padx = 10, pady = 10)
         self.writeBox.bind("<KeyRelease>", self.updateCount)
         
         self.charNum = StringVar()
-        self.counter = Label(self, textvariable=self.charNum).pack(side=TOP)
+        self.counter = Label(self, textvariable=self.charNum).grid(padx = 10, row = 0, column = 0, sticky = SW) #remeber COUNTER GRID!!!
         
-        self.saveButton = Button(self, text="Save", command = lambda: self.saveCurrent()).pack(side=TOP)
+        self.saveButton = Button(self, text="Save", command = lambda: self.saveCurrent()).grid(row = 0, column = 0, sticky = SE, padx = 10)
         
-        self.tweetButton = Button(self, text="Tweet!", command = lambda: self.tweet()).pack(side = BOTTOM)
+        self.tweetButton = Button(self, text="Tweet!", command = lambda: self.tweet()).grid(row = 0, column = 2, sticky = N)
         
-        self.deleteButton = Button(self, text="Delete", command = lambda: self.delete()).pack(side = BOTTOM)
+        self.deleteButton = Button(self, text="Delete", command = lambda: self.delete()).grid(row = 0, column = 2, sticky = S)
         
-        self.saveBox = Listbox(self, width = 70, height = 100)
+        self.saveBox = Listbox(self, width = 40)
 
     def loadSavedTweets(self): #also prints them :)
         self.saveBox.delete(0, END) #deletes what's currently in there
@@ -56,7 +54,7 @@ class Example(Frame):
             self.tweets = []
             
         theFile.close()
-        self.saveBox.pack(padx=10, pady=10, side=BOTTOM)
+        self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
         
     def getWriteBox(self):
         contents = self.writeBox.get("1.0", END)
@@ -131,8 +129,8 @@ class Example(Frame):
 
 def main():
     root = Tk()
-    #root.resizable(0, 0)    disables window resizing
-    root.geometry("500x500") #must be created before others
+    root.resizable(0, 0)    #disables window resizing
+    root.geometry("750x170+300+300") #must be created before others
     app = Example(root)
     root.mainloop()
         
