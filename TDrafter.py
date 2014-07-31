@@ -15,7 +15,9 @@ class Example(Frame):
         
         self.apikey="kFccJJtoM20smgxwIjGnCcqDX"
         self.apisecret="7cz3XcENohWT2N2KvRh6pwXXs0WC9gHVb6Mf9pW8caGoGlbDIV"
-
+        
+        self.insertIndex = None
+        
         self.parent = parent
         self.initUI()
         self.loadSavedTweets()
@@ -26,7 +28,7 @@ class Example(Frame):
         self.parent.title("TDrafter")
         self.pack(fill = BOTH, expand=True)
         
-        self.writeBox = Text(self, padx = 10, pady = 10, width = 40, height = 4)
+        self.writeBox = Text(self, wrap = WORD, padx = 10, pady = 10, width = 40, height = 4)
         self.writeBox.insert("1.0","draft your tweet here!")
         self.writeBox.grid(row = 0, column = 0, padx = 10, pady = 10)
         self.writeBox.bind("<KeyRelease>", self.updateCount)
@@ -37,21 +39,26 @@ class Example(Frame):
         self.saveButton = Button(self, text="Save", command = lambda: self.saveCurrent()).grid(row = 0, column = 0, sticky = SE, padx = 10)
         
         self.tweetButton = Button(self, text="Tweet!", command = lambda: self.tweet()).grid(row = 0, column = 2, sticky = N)
-        
-        self.deleteButton = Button(self, text="Delete", command = lambda: self.delete()).grid(row = 0, column = 2, sticky = S)
-        
-        self.saveBox = Listbox(self, width = 40)
+        self.deleteButton = Button(self, text="Edit", command = lambda: self.edit()).grid(row = 0, column = 2, sticky = EW)
+        self.editButton = Button(self, text="Delete", command = lambda: self.delete()).grid(row = 0, column = 2, sticky = S)
 
-    def loadSavedTweets(self): #also prints them :)
+        self.saveBox = Listbox(self, width = 40)
+        
+    def clearBoth(self):
         self.saveBox.delete(0, END) #deletes what's currently in there
         self.writeBox.delete("1.0", END)
+    
+    def loadSavedTweets(self): #also prints them :)
+        self.saveBox.delete(0, END)
         theFile = open("savedTweets.p", "r")
         try:
             self.tweets = pickle.load(theFile)
             for item in self.tweets:
-                self.saveBox.insert(0, item.strip())
+                print "printing", item
+                self.saveBox.insert(END, item.strip())
         except:
             self.tweets = []
+            print error
             
         theFile.close()
         self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
@@ -61,14 +68,15 @@ class Example(Frame):
         return contents
     
     def getSaveBox(self):
-        theTweet = int(self.saveBox.curselection()[0])
-        return self.saveBox.get(theTweet)
+        index = int(self.saveBox.curselection()[0])
+        return self.saveBox.get(index)
         
     def tweet(self):
         draft = self.getSaveBox().strip()
+        print draft
         try:
             api = tp.API(self.auth)
-            api.update_status(draft)
+            #api.update_status(draft)
             print "Tweeted. Phew!"
         except tp.TweepError:
             print tp.tweepError
@@ -79,8 +87,16 @@ class Example(Frame):
             print "Sorry, too long! This is twitter, remember?"
         else:
             draft = self.getWriteBox().strip()
-            self.tweets.append(draft)
+            if self.insertIndex == None:
+                self.tweets.append(draft)
+            else:
+                try:
+                    self.tweets[self.insertIndex] = draft
+                except:
+                    print "Error inserting the tweet back"
             self.saveTweets()
+            self.insertIndex = None
+            self.writeBox.delete("1.0", END)
         
     def saveTweets(self):
         theFile = open("savedTweets.p", "w")
@@ -88,11 +104,18 @@ class Example(Frame):
         theFile.close()
         self.loadSavedTweets()
         
-        
     def delete(self):
         theTweet = self.getSaveBox()
         self.tweets.remove(theTweet)
         self.saveTweets()
+        self.loadSavedTweets()
+        
+    def edit(self):
+        self.writeBox.delete("1.0", END)
+        toEdit = self.getSaveBox().strip()
+        self.insertIndex = int(self.saveBox.curselection()[0])
+        print "insertIndex: ", self.insertIndex
+        self.writeBox.insert(INSERT, toEdit)
         self.loadSavedTweets()
     
     def updateCount(self, hello):
