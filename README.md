@@ -6,6 +6,11 @@ Undergoing rapid development
 
 * Version 1.0.0
 
+## Planned Features ##
++ Multiple account support/persistence
++ Multithreading support
++ Color
+
 ### How do I get set up? ###
 
 * Summary of set up: Download the source code, then install Python if you don't have it on your system. The only dependency not part of the Python standard distribution is tweepy, which you can download from your repository (Linux) or https://github.com/tweepy/tweepy
