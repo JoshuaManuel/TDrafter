@@ -15,7 +15,9 @@ It's ready for other OSes now.
 
 ### How do I get set up? ###
 
-* Summary of set up: Download the source code, then install Python if you don't have it on your system. The only dependency not part of the Python standard distribution is tweepy, which you can download from your repository (Linux) or https://github.com/tweepy/tweepy
+* Summary of set up:
+    + Download the source code, then install Python if you don't have it on your system. The only dependency not part of the Python standard distribution is tweepy, which you can download from your repository (Linux) or https://github.com/tweepy/tweepy
+    + Download the whole TDrafter build file. Then run it. **Only tested on Fedora 20, with x86_64 processor**. So the binary probably won't work on other machines.
 
 * Configuration: Just donwload the source and install python and tweepy. I'm working on creating and distributing binaries... not that good yet. :)
 
