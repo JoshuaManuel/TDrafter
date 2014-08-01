@@ -1,0 +1,9 @@
+('/home/hal/Downloads/PyInstaller-2.1/TDrafter/build/TDrafter/TDrafter',
+ True,
+ False,
+ None,
+ None,
+ [],
+ None,
+ False,
+ 1406927204)
