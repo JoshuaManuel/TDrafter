@@ -1,7 +1,22 @@
 '''
 Created on Jul 24, 2014
 
-@author: hal
+VERSION: 1.0.5
+
+*This is the first version ready for a cross-platform implementation
+*If you encounter errors when starting up the program, try making empty files called "savedTweets.p" and "data.p" in the program's current directory
+
+Author: Joshua Manuel
+
+If you have any issues, contact me at:
+@QuiteRather
+manueljosh3[at]gmail.com
+
+THIS CODE IS CURRENTLY PROVIDED WITHOUT A LISENCE, WHICH MEANS, TECHNICALLY YOU HAVE NO LEGAL RIGHT TO USE IT.
+I THINK.
+
+>:/
+
 '''
 
 from Tkinter import *
@@ -17,6 +32,8 @@ class Example(Frame):
         self.apisecret="7cz3XcENohWT2N2KvRh6pwXXs0WC9gHVb6Mf9pW8caGoGlbDIV"
         
         self.insertIndex = None
+        self.tweets = []
+        self.auth = tp.OAuthHandler(self.apikey, self.apisecret)
         
         self.parent = parent
         self.initUI()
@@ -34,7 +51,7 @@ class Example(Frame):
         self.writeBox.bind("<KeyRelease>", self.updateCount)
         
         self.charNum = StringVar()
-        self.counter = Label(self, textvariable=self.charNum).grid(padx = 10, row = 0, column = 0, sticky = SW) #remeber COUNTER GRID!!!
+        self.counter = Label(self, textvariable=self.charNum, bg = "white").grid(padx = 10, row = 0, column = 0, sticky = SW) #remeber COUNTER GRID!!!
         
         self.saveButton = Button(self, text="Save", command = lambda: self.saveCurrent()).grid(row = 0, column = 0, sticky = SE, padx = 10)
         
@@ -50,16 +67,15 @@ class Example(Frame):
     
     def loadSavedTweets(self): #also prints them :)
         self.saveBox.delete(0, END)
+        theFile = open("savedTweets.p", "a")
+        theFile.close()
         theFile = open("savedTweets.p", "r")
         try:
             self.tweets = pickle.load(theFile)
             for item in self.tweets:
-                print "printing", item
                 self.saveBox.insert(END, item.strip())
         except:
-            self.tweets = []
-            print error
-            
+            pass
         theFile.close()
         self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
         
@@ -68,18 +84,20 @@ class Example(Frame):
         return contents
     
     def getSaveBox(self):
-        index = int(self.saveBox.curselection()[0])
-        return self.saveBox.get(index)
+        try:
+            index = int(self.saveBox.curselection()[0])
+            return self.saveBox.get(index)
+        except:
+            pass
         
     def tweet(self):
         draft = self.getSaveBox().strip()
         print draft
         try:
             api = tp.API(self.auth)
-            #api.update_status(draft)
+            api.update_status(draft)
             print "Tweeted. Phew!"
         except tp.TweepError:
-            print tp.tweepError
             self.getAccess()
 
     def saveCurrent(self):
@@ -94,27 +112,36 @@ class Example(Frame):
                     self.tweets[self.insertIndex] = draft
                 except:
                     print "Error inserting the tweet back"
-            self.saveTweets()
+            
             self.insertIndex = None
+            self.saveTweets()
+            self.loadSavedTweets()
             self.writeBox.delete("1.0", END)
+            self.saveBox.selection_set(END)
+            self.saveBox.see(END)
+            
         
     def saveTweets(self):
         theFile = open("savedTweets.p", "w")
         pickle.dump(self.tweets, theFile)
         theFile.close()
-        self.loadSavedTweets()
         
     def delete(self):
         theTweet = self.getSaveBox()
         self.tweets.remove(theTweet)
         self.saveTweets()
         self.loadSavedTweets()
+        if self.insertIndex != None:
+            self.saveBox.selection_set(self.insertIndex)
+            self.saveBox.see(self.insertIndex)
+        else:
+            self.saveBox.selection_set(END)
+            self.saveBox.see(END)
         
     def edit(self):
         self.writeBox.delete("1.0", END)
         toEdit = self.getSaveBox().strip()
         self.insertIndex = int(self.saveBox.curselection()[0])
-        print "insertIndex: ", self.insertIndex
         self.writeBox.insert(INSERT, toEdit)
         self.loadSavedTweets()
     
@@ -128,26 +155,52 @@ class Example(Frame):
         return len(a)
     
     def getAccess(self):
-        self.auth = tp.OAuthHandler(self.apikey, self.apisecret)
-        webbrowser.open(self.auth.get_authorization_url())
-        pin = raw_input("Type your verification pin: ").strip()
-        token = self.auth.get_access_token(pin)
-        self.auth.set_access_token(token.key, token.secret)
-        print self.auth
-        self.saveAccess()
+        try:
+            webbrowser.open(self.auth.get_authorization_url())
+            
+            def callback():
+                pin = enter.get()
+                top.destroy()
+                try:
+                    token = self.auth.get_access_token(pin)
+                    self.auth.set_access_token(token.key, token.secret)
+                except:
+                    self.auth = None
+                    pass
+                self.saveAccess()
+                self.tweet()
+            
+            top = Toplevel()
+            top.title("TDrafter")
+            msg = Label(top, text="Enter your verification pin to log in:\n(A browser window should have opened)")
+            msg.grid(row = 0, column = 0, columnspan = 2, padx = 10, pady = 10)
+            
+            enter = Entry(top)
+            enter.grid(row = 1, column = 0, padx = 10)
+            
+            button = Button(top, text="Submit", command=callback)
+            button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = S)
+            top.pack()
+        except:
+            print "You didn't enter the pin! C'mon, man..."
+            pass
     
     def saveAccess(self):
         theFile = open("data.p", "w")
         pickle.dump (self.auth, theFile)
-        print "Saved THE TOKEN!"
+        print "Saved your auth token"
         
     def loadAccess(self):
         try:
+            theFile = open("data.p", "a")
+            theFile.close()
             theFile = open("data.p", "r")
             self.auth = pickle.load(theFile)
+            theFile.close()
             print "Loaded access token"
         except:
             print "No auth token yet!"
+            self.getAccess()
         
 
 def main():
