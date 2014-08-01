@@ -1,9 +1,9 @@
 '''
 Created on Jul 24, 2014
 
-VERSION: 1.0.5
+VERSION: 1.1.0
 
-*This is the first version ready for a cross-platform implementation
+*This is the first version ready for a multiplatform use
 *If you encounter errors when starting up the program, try making empty files called "savedTweets.p" and "data.p" in the program's current directory
 
 Author: Joshua Manuel

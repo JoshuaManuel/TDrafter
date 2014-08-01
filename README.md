@@ -4,7 +4,9 @@
 
 Undergoing rapid development
 
-* Version 1.0.0
+* Version 1.1.0
+
+It's ready for other OSes now.
 
 ## Planned Features ##
 + Multiple account support/persistence
