@@ -15,14 +15,21 @@ manueljosh3[at]gmail.com
 THIS CODE IS CURRENTLY PROVIDED WITHOUT A LISENCE, WHICH MEANS, TECHNICALLY YOU HAVE NO LEGAL RIGHT TO USE IT.
 I THINK.
 
+If you need to uninstall the program, don't forget to remove the hidden /.TDrafter file in your home directory
+
 >:/
 
 '''
 
 from Tkinter import *
+import tkFileDialog
+import tkMessageBox
 import cPickle as pickle
 import tweepy as tp
 import webbrowser
+import os
+import os.path
+import shutil
 
 class Example(Frame):
     def __init__(self, parent):
@@ -34,11 +41,13 @@ class Example(Frame):
         self.insertIndex = None
         self.tweets = []
         self.auth = tp.OAuthHandler(self.apikey, self.apisecret)
+        self.home = os.path.expanduser("~")
+        
+        if not os.path.exists(self.home + "/.TDrafter"):
+            os.makedirs(self.home + "/.TDrafter")
+            print "run the setup script first!"
         
         self.parent = parent
-        self.initUI()
-        self.loadSavedTweets()
-        self.loadAccess()
         
     def initUI(self):
         
@@ -60,23 +69,27 @@ class Example(Frame):
         self.editButton = Button(self, text="Delete", command = lambda: self.delete()).grid(row = 0, column = 2, sticky = S)
 
         self.saveBox = Listbox(self, width = 40)
+        self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
+        self.createMenu()
         
     def clearBoth(self):
         self.saveBox.delete(0, END) #deletes what's currently in there
         self.writeBox.delete("1.0", END)
     
     def loadSavedTweets(self): #also prints them :)
-        self.saveBox.delete(0, END)
-        theFile = open("savedTweets.p", "a")
-        theFile.close()
-        theFile = open("savedTweets.p", "r")
+        
+        
         try:
+            theFile = open(self.home + "/.TDrafter/savedTweets.p", "a" )
+            theFile.close()
+            theFile = open(self.home + "/.TDrafter/savedTweets.p", "r")
             self.tweets = pickle.load(theFile)
-            for item in self.tweets:
-                self.saveBox.insert(END, item.strip())
+            
+            
+            theFile.close()
         except:
             pass
-        theFile.close()
+            
         self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
         
     def getWriteBox(self):
@@ -96,9 +109,14 @@ class Example(Frame):
         try:
             api = tp.API(self.auth)
             api.update_status(draft)
-            print "Tweeted. Phew!"
+            tkMessageBox.showinfo("TDrafter", message='Tweeted!')
         except tp.TweepError:
             self.getAccess()
+            
+    def renderTweets(self):
+        self.saveBox.delete(0, END)
+        for item in self.tweets:
+            self.saveBox.insert(END, item.strip())
 
     def saveCurrent(self):
         if len(self.getWriteBox()) > 140:
@@ -114,15 +132,14 @@ class Example(Frame):
                     print "Error inserting the tweet back"
             
             self.insertIndex = None
-            self.saveTweets()
-            self.loadSavedTweets()
             self.writeBox.delete("1.0", END)
+            self.renderTweets()
             self.saveBox.selection_set(END)
             self.saveBox.see(END)
             
         
     def saveTweets(self):
-        theFile = open("savedTweets.p", "w")
+        theFile = open(self.home + "/.TDrafter/savedTweets.p", "w")
         pickle.dump(self.tweets, theFile)
         theFile.close()
         
@@ -183,32 +200,78 @@ class Example(Frame):
             top.pack()
         except:
             print "You didn't enter the pin! C'mon, man..."
+            
             pass
     
     def saveAccess(self):
-        theFile = open("data.p", "w")
+        theFile = open(self.home + "/.TDrafter/data.p", "w")
         pickle.dump (self.auth, theFile)
         print "Saved your auth token"
         
     def loadAccess(self):
         try:
-            theFile = open("data.p", "a")
+            theFile = open(self.home + "/.TDrafter/data.p", "a")
             theFile.close()
-            theFile = open("data.p", "r")
+            theFile = open(self.home + "/.TDrafter/data.p", "r")
             self.auth = pickle.load(theFile)
             theFile.close()
             print "Loaded access token"
         except:
             print "No auth token yet!"
-            self.getAccess()
+            #self.getAccess()
+            pass
         
+    def createMenu(self):
+        self.menuBar = Menu(self)
+        self.fileMenu = Menu(self.menuBar)
+        self.fileMenu.add_command(label = "New", command = self.newWindow)
+        self.fileMenu.add_command(label = "Open", command = self.loadState)
+        self.fileMenu.add_command(label = "Save As...", command = self.saveState)
+        self.fileMenu.add_command(label = "Delete", command = self.deleteState)
+        self.menuBar.add_cascade(label="File", menu = self.fileMenu)
+        self.parent.config(menu=self.menuBar)
+        
+    def newWindow(self):
+        main()
 
+    def loadState(self):
+        path = tkFileDialog.askdirectory(initialdir=self.home + "/.TDrafter")
+        print "Loadstate: ", path
+        dataFile = open(path + "/access.p", "r")
+        self.auth = pickle.load(dataFile)
+        dataFile.close()
+        tweetsFile = open(path + "/tweets.p", "r")
+        self.tweets = pickle.load(tweetsFile)
+        tweetsFile.close()
+        
+        self.renderTweets()
+        
+    def saveState(self):
+        path = tkFileDialog.askdirectory(initialdir=self.home + "/.TDrafter")
+        print "saveState", path
+        
+        if not os.path.exists(path):
+            os.makedirs(path)
+        
+        dataFile = open(path + "/access.p", "w")
+        pickle.dump(self.auth, dataFile)
+        dataFile.close()
+        tweetsFile = open(path + "/tweets.p", "w")
+        pickle.dump(self.tweets, tweetsFile)
+        tweetsFile.close()
+    def deleteState(self):
+        path = tkFileDialog.askdirectory(initialdir=self.home + "/.TDrafter")
+        shutil.rmtree(path)
+        
+        
 def main():
     root = Tk()
     root.resizable(0, 0)    #disables window resizing
     root.geometry("750x170+300+300") #must be created before others
     app = Example(root)
-    root.mainloop()
+    app.initUI()
+    
+    app.mainloop()
         
 if __name__ == '__main__':
     main()
