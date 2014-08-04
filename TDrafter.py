@@ -1,7 +1,7 @@
 '''
 Created on Jul 24, 2014
 
-VERSION: 1.1.0
+VERSION: 1.1.1
 
 *This is the first version ready for a multiplatform use
 *If you encounter errors when starting up the program, try making empty files called "savedTweets.p" and "data.p" in the program's current directory
@@ -97,11 +97,8 @@ class Example(Frame):
         return contents
     
     def getSaveBox(self):
-        try:
-            index = int(self.saveBox.curselection()[0])
-            return self.saveBox.get(index)
-        except:
-            pass
+        index = int(self.saveBox.curselection()[0])
+        return self.saveBox.get(index)
         
     def tweet(self):
         draft = self.getSaveBox().strip()

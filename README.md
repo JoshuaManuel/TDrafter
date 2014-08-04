@@ -4,13 +4,13 @@
 
 Undergoing rapid development
 
-* Version 1.1.0
+* Version 1.1.1
 
 It's ready for other OSes now.
 
 ## Planned Features ##
-+ Multiple account support/persistence
-+ Multithreading support
++ Multiple account support/persistence CHECK!
++ Multithreading support (Not needed due to class instantiation) CHECK!
 + Color
 
 ### How do I get set up? ###
