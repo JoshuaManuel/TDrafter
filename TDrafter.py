@@ -1,7 +1,7 @@
 '''
 Created on Jul 24, 2014
 
-VERSION: 1.1.1
+VERSION: 1.1.2
 
 *This is the first version ready for a multiplatform use
 *If you encounter errors when starting up the program, try making empty files called "savedTweets.p" and "data.p" in the program's current directory
@@ -84,7 +84,7 @@ class Example(Frame):
         draft = self.getSaveBox().strip()
         print draft
         try:
-            api = tp.API(self.auth)
+            
             api.update_status(draft)
             tkMessageBox.showinfo("TDrafter", message='Tweeted!')
         except tp.TweepError:
@@ -170,26 +170,6 @@ class Example(Frame):
             button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = S)
             top.pack()
         except:
-            print "You didn't enter the pin! C'mon, man..."
-            
-            pass
-    
-    def saveAccess(self):
-        theFile = open(self.home + "/.TDrafter/data.p", "w")
-        pickle.dump (self.auth, theFile)
-        print "Saved your auth token"
-        
-    def loadAccess(self):
-        try:
-            theFile = open(self.home + "/.TDrafter/data.p", "a")
-            theFile.close()
-            theFile = open(self.home + "/.TDrafter/data.p", "r")
-            self.auth = pickle.load(theFile)
-            theFile.close()
-            print "Loaded access token"
-        except:
-            print "No auth token yet!"
-            #self.getAccess()
             pass
         
     def createMenu(self):
@@ -214,8 +194,12 @@ class Example(Frame):
         tweetsFile = open(path + "/tweets.p", "r")
         self.tweets = pickle.load(tweetsFile)
         tweetsFile.close()
-        
         self.renderTweets()
+        
+        self.api = tp.API(self.auth)
+        self.info = self.api.me()
+        print self.info
+        self.renderName()
         
     def saveState(self):
         path = tkFileDialog.askdirectory(initialdir=self.home + "/.TDrafter")
@@ -230,9 +214,14 @@ class Example(Frame):
         tweetsFile = open(path + "/tweets.p", "w")
         pickle.dump(self.tweets, tweetsFile)
         tweetsFile.close()
+        
     def deleteState(self):
         path = tkFileDialog.askdirectory(initialdir=self.home + "/.TDrafter")
         shutil.rmtree(path)
+        
+    def renderName(self):
+        name = self.info.screen_name
+        a = Label(text=name, bg="white").grid(sticky=N, padx = 10, pady = 10)
         
         
 def main():
