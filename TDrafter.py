@@ -72,26 +72,6 @@ class Example(Frame):
         self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
         self.createMenu()
         
-    def clearBoth(self):
-        self.saveBox.delete(0, END) #deletes what's currently in there
-        self.writeBox.delete("1.0", END)
-    
-    def loadSavedTweets(self): #also prints them :)
-        
-        
-        try:
-            theFile = open(self.home + "/.TDrafter/savedTweets.p", "a" )
-            theFile.close()
-            theFile = open(self.home + "/.TDrafter/savedTweets.p", "r")
-            self.tweets = pickle.load(theFile)
-            
-            
-            theFile.close()
-        except:
-            pass
-            
-        self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
-        
     def getWriteBox(self):
         contents = self.writeBox.get("1.0", END)
         return contents
@@ -133,12 +113,6 @@ class Example(Frame):
             self.renderTweets()
             self.saveBox.selection_set(END)
             self.saveBox.see(END)
-            
-        
-    def saveTweets(self):
-        theFile = open(self.home + "/.TDrafter/savedTweets.p", "w")
-        pickle.dump(self.tweets, theFile)
-        theFile.close()
         
     def delete(self):
         theTweet = self.getSaveBox()
