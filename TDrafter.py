@@ -48,6 +48,7 @@ class Example(Frame):
             print "run the setup script first!"
         
         self.parent = parent
+        self.parent.protocol("WM_DELETE_WINDOW", self.ask_quit)
         
     def initUI(self):
         
@@ -59,14 +60,14 @@ class Example(Frame):
         self.writeBox.grid(row = 0, column = 0, padx = 10, pady = 10)
         self.writeBox.bind("<KeyRelease>", self.updateCount)
         
-        self.charNum = StringVar()
-        self.counter = Label(self, textvariable=self.charNum, bg = "white").grid(padx = 10, row = 0, column = 0, sticky = SW) #remeber COUNTER GRID!!!
+        self.counter = Label(self, text = "0")
+        self.counter.grid(padx = 10, row = 0, column = 0, sticky = SW)
         
-        self.saveButton = Button(self, text="Save", command = lambda: self.saveCurrent()).grid(row = 0, column = 0, sticky = SE, padx = 10)
+        self.saveButton = Button(self, text = "Save", command = lambda: self.saveCurrent()).grid(row = 0, column = 0, sticky = SE, padx = 10)
         
-        self.tweetButton = Button(self, text="Tweet!", command = lambda: self.tweet()).grid(row = 0, column = 2, sticky = N)
-        self.deleteButton = Button(self, text="Edit", command = lambda: self.edit()).grid(row = 0, column = 2, sticky = EW)
-        self.editButton = Button(self, text="Delete", command = lambda: self.delete()).grid(row = 0, column = 2, sticky = S)
+        self.tweetButton = Button(self, text = "Tweet!", command = lambda: self.tweet()).grid(row = 0, column = 2, sticky = N)
+        self.deleteButton = Button(self, text = "Edit", command = lambda: self.edit()).grid(row = 0, column = 2, sticky = EW)
+        self.editButton = Button(self, text = "Delete", command = lambda: self.delete()).grid(row = 0, column = 2, sticky = S)
 
         self.saveBox = Listbox(self, width = 40)
         self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
@@ -85,7 +86,7 @@ class Example(Frame):
         print draft
         try:
             
-            api.update_status(draft)
+            self.api.update_status(draft)
             tkMessageBox.showinfo("TDrafter", message='Tweeted!')
         except tp.TweepError:
             self.getAccess()
@@ -131,12 +132,11 @@ class Example(Frame):
         toEdit = self.getSaveBox().strip()
         self.insertIndex = int(self.saveBox.curselection()[0])
         self.writeBox.insert(INSERT, toEdit)
-        self.loadSavedTweets()
     
-    def updateCount(self, hello):
+    def updateCount(self, a):
         value = self.count()
         value = str(value-1)
-        self.charNum.set(value)
+        self.counter.config(text = value)
         
     def count(self):
         a = self.getWriteBox()
@@ -222,6 +222,11 @@ class Example(Frame):
     def renderName(self):
         name = self.info.screen_name
         a = Label(text=name, bg="white").grid(sticky=N, padx = 10, pady = 10)
+    
+    def ask_quit(self):
+        if tkMessageBox.askyesno("Save?", "Save session first?"):
+            self.saveState()
+        self.quit()
         
         
 def main():
@@ -229,6 +234,7 @@ def main():
     root.resizable(0, 0)    #disables window resizing
     root.geometry("750x170+300+300") #must be created before others
     app = Example(root)
+    
     app.initUI()
     
     app.mainloop()

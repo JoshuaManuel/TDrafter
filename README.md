@@ -12,6 +12,7 @@ It's ready for other OSes now.
 + Multiple account support/persistence CHECK!
 + Multithreading support (Not needed due to class instantiation) CHECK!
 + Color
++ Class to handle multiple instances
 
 ### How do I get set up? ###
 
