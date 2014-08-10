@@ -41,8 +41,9 @@ class Example(Frame):
         self.insertIndex = None
         self.tweets = []
         self.auth = tp.OAuthHandler(self.apikey, self.apisecret)
-        self.home = os.path.expanduser("~")
+        self.api = tp.API(self.auth)
         
+        self.home = os.path.expanduser("~")
         if not os.path.exists(self.home + "/.TDrafter"):
             os.makedirs(self.home + "/.TDrafter")
             print "run the setup script first!"
@@ -60,7 +61,7 @@ class Example(Frame):
         self.writeBox.grid(row = 0, column = 0, padx = 10, pady = 10)
         self.writeBox.bind("<KeyRelease>", self.updateCount)
         
-        self.counter = Label(self, text = "0")
+        self.counter = Label(self, text = self.count(), bg = "white")
         self.counter.grid(padx = 10, row = 0, column = 0, sticky = SW)
         
         self.saveButton = Button(self, text = "Save", command = lambda: self.saveCurrent()).grid(row = 0, column = 0, sticky = SE, padx = 10)
@@ -155,7 +156,7 @@ class Example(Frame):
                 except:
                     self.auth = None
                     pass
-                self.saveAccess()
+                self.saveState()
                 self.tweet()
             
             top = Toplevel()
@@ -198,7 +199,6 @@ class Example(Frame):
         
         self.api = tp.API(self.auth)
         self.info = self.api.me()
-        print self.info
         self.renderName()
         
     def saveState(self):
