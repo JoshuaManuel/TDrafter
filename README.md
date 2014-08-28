@@ -4,9 +4,9 @@
 
 Undergoing rapid development
 
-* Version 1.1.1
+* Version 1.2.1
 
-It's ready for other OSes now.
+This version implements a handler class, pretty unstable for now.
 
 ## Planned Features ##
 + Multiple account support/persistence CHECK!

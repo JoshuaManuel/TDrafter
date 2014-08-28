@@ -32,8 +32,8 @@ import os.path
 import shutil
 
 class Example(Frame):
-    def __init__(self, parent):
-        Frame.__init__(self, parent, background="white")
+    def __init__(self):
+        
         
         self.apikey="kFccJJtoM20smgxwIjGnCcqDX"
         self.apisecret="7cz3XcENohWT2N2KvRh6pwXXs0WC9gHVb6Mf9pW8caGoGlbDIV"
@@ -48,8 +48,15 @@ class Example(Frame):
             os.makedirs(self.home + "/.TDrafter")
             print "run the setup script first!"
         
-        self.parent = parent
+        #SETUP THE WINDOW
+        self.parent = Tk()
+        self.parent.resizable(0, 0)
+        self.parent.geometry("750x170+300+300")
         self.parent.protocol("WM_DELETE_WINDOW", self.ask_quit)
+        Frame.__init__(self, background="white")
+        
+        self.initUI()
+        self.mainloop()
         
     def initUI(self):
         
@@ -86,7 +93,6 @@ class Example(Frame):
         draft = self.getSaveBox().strip()
         print draft
         try:
-            
             self.api.update_status(draft)
             tkMessageBox.showinfo("TDrafter", message='Tweeted!')
         except tp.TweepError:
@@ -156,12 +162,11 @@ class Example(Frame):
                 except:
                     self.auth = None
                     pass
-                self.saveState()
-                self.tweet()
+                
             
             top = Toplevel()
             top.title("TDrafter")
-            msg = Label(top, text="Enter your verification pin to log in:\n(A browser window should have opened)")
+            msg = Label(top, text="You haven't logged in yet!\nEnter your verification pin to log in:\n(A browser window should have opened)")
             msg.grid(row = 0, column = 0, columnspan = 2, padx = 10, pady = 10)
             
             enter = Entry(top)
@@ -230,14 +235,16 @@ class Example(Frame):
         
         
 def main():
-    root = Tk()
-    root.resizable(0, 0)    #disables window resizing
-    root.geometry("750x170+300+300") #must be created before others
-    app = Example(root)
+    #root = Tk()
+    #root.resizable(0, 0)    #disables window resizing
+    #root.geometry("750x170+300+300") #must be created before others
+    #app = Example(root)
     
-    app.initUI()
+    #app.initUI()
     
-    app.mainloop()
+    #app.mainloop()
+    a = Example()
+    print "run td instead!"
         
 if __name__ == '__main__':
     main()
