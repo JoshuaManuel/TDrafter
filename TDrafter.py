@@ -1,11 +1,6 @@
 '''
 Created on Jul 24, 2014
 
-VERSION: 1.1.2
-
-*This is the first version ready for a multiplatform use
-*If you encounter errors when starting up the program, try making empty files called "savedTweets.p" and "data.p" in the program's current directory
-
 Author: Joshua Manuel
 
 If you have any issues, contact me at:
@@ -22,6 +17,8 @@ If you need to uninstall the program, don't forget to remove the hidden /.TDraft
 '''
 
 from Tkinter import *
+from threading import Thread
+import Queue
 import tkFileDialog
 import tkMessageBox
 import cPickle as pickle
@@ -31,10 +28,10 @@ import os
 import os.path
 import shutil
 
-class Example(Frame):
-    def __init__(self):
-        
-        
+class TDrafter(Frame, Thread):
+    
+    def run(self):
+        #The program's API key for Twitter
         self.apikey="kFccJJtoM20smgxwIjGnCcqDX"
         self.apisecret="7cz3XcENohWT2N2KvRh6pwXXs0WC9gHVb6Mf9pW8caGoGlbDIV"
         
@@ -46,7 +43,6 @@ class Example(Frame):
         self.home = os.path.expanduser("~")
         if not os.path.exists(self.home + "/.TDrafter"):
             os.makedirs(self.home + "/.TDrafter")
-            print "run the setup script first!"
         
         #SETUP THE WINDOW
         self.parent = Tk()
@@ -55,10 +51,9 @@ class Example(Frame):
         self.parent.protocol("WM_DELETE_WINDOW", self.ask_quit)
         Frame.__init__(self, background="white")
         
-        self.initUI()
-        self.mainloop()
         
-    def initUI(self):
+        ###########fill the window############ 
+        
         
         self.parent.title("TDrafter")
         self.pack(fill = BOTH, expand=True)
@@ -80,6 +75,8 @@ class Example(Frame):
         self.saveBox = Listbox(self, width = 40)
         self.saveBox.grid(row = 0, column = 1, sticky = E, rowspan = 1, padx = 10)
         self.createMenu()
+        
+        self.mainloop()
         
     def getWriteBox(self):
         contents = self.writeBox.get("1.0", END)
@@ -189,8 +186,8 @@ class Example(Frame):
         self.parent.config(menu=self.menuBar)
         
     def newWindow(self):
-        main()
-
+        print "function will be replaced"
+        
     def loadState(self):
         path = tkFileDialog.askdirectory(initialdir=self.home + "/.TDrafter")
         print "Loadstate: ", path
@@ -233,18 +230,6 @@ class Example(Frame):
             self.saveState()
         self.quit()
         
-        
-def main():
-    #root = Tk()
-    #root.resizable(0, 0)    #disables window resizing
-    #root.geometry("750x170+300+300") #must be created before others
-    #app = Example(root)
-    
-    #app.initUI()
-    
-    #app.mainloop()
-    a = Example()
-    print "run td instead!"
-        
 if __name__ == '__main__':
-    main()
+    foo = TDrafter()
+    foo.run()
